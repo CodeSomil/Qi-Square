@@ -1,14 +1,18 @@
 from bs4 import BeautifulSoup
 import requests
 
-source = requests.get("https://www.openstreetmap.org/search?query=st+vincents+high+school").text
+source = requests.get("https://www.openstreetmap.org/search?query=st+vincents").text
+source2= requests.get("https://www.openstreetmap.org/geocoder/search_osm_nominatim?query=st+vincents").text
 
-soup = BeautifulSoup(source,'lxml')
+soup = BeautifulSoup(source2,'lxml')
 
 # print(soup.prettify())
 
+res=soup.find('body')
+print(res)
+
 summ= soup.find('div',class_="search_results_entry")
-print(summ)
+# print(summ)
 
 hu=soup.find('ul',class_="results-list list-group list-group-flush")
 # print (hu)
