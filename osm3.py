@@ -2,18 +2,28 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 import re
-ipDF=pd.read_excel('Input.xlsx')
+import csv
+
+ipDF=pd.read_csv('Input.csv')
 #print(ipDF.columns)
 #li=list(ipDF['Building Name\n'])
 count=1
-b_name_list=list(ipDF['Building Name\n'])[:20]
-b_add_list=list(ipDF['Building Address'])[:20]
+na=0
+c=0
+b_name_list=list(ipDF['Building Name\n'])[:100]
+b_add_list=list(ipDF['Building Address'])[:100]
+lines=len(list(b_name_list))
+output_file=open("output_osm.csv","w",newline='')
+csv_write=csv.writer(output_file)
+csv_write.writerow(["Building Name", "Country" , "Zip Code", "OSM id"])
+
 for i,j in zip(b_name_list,b_add_list):
     if type(i)==str and type(j)==str:
         #print(j)
         country_zip=j.split(sep=',')[1]
         country=country_zip.split()[0]
         zipp=country_zip.split()[1]
+        c+=1
 
 
         search_url="https://www.openstreetmap.org/geocoder/search_osm_nominatim?query="
@@ -36,14 +46,18 @@ for i,j in zip(b_name_list,b_add_list):
         print("count:{}: OSM for {} {} {} is :".format(count,i,country,zipp),end='')
         if len(l)>0:
             print(l[0])
+            csv_write.writerow([i,country,zipp,l[0]])
+            
         else:
-            print("Not available")
-
-
-
+            na+=1
+            csv_write.writerow([i,country,zipp,"Not available"])
+            # print("Not available")
+        
+        
         #print(i,"  {}".format(count))
         count+=1
+print("\n\n ----------Summary----------\n\n")
+print("Number of records scanned :- {} \n Missing data records :- {} \n Total OSM ids found :- {} \n Unavailable OSM:- {}".format(lines,(lines-c),(c-na),na))
 
 #opDF=ipDF
 #opDF['OSM']=li
-#opDF.to_excel('Output.xlsx')
